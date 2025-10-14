@@ -15,7 +15,7 @@ public final class Convert {
         byte[] bytes = new byte[hex.length / 2];
 
         for(int i = 0; i < bytes.length; i++)
-            bytes[i] = Byte.parseByte("" + hex[i * 2] + hex[i * 2 + 1], 16);
+            bytes[i] = (byte) Integer.parseInt("" + hex[i * 2] + hex[i * 2 + 1], 16);
 
         return bytes;
     }

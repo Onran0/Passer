@@ -350,10 +350,13 @@ public class Main {
 
                     if(type == PasswordType.BINARY) {
                         try {
-                            password = Convert.getBinaryFromHex(passwordToken.toString());
+                            password = Convert.getBinaryFromHex(passwordToken);
                             incorrectUsage = false;
                         } catch(NumberFormatException ignored) {}
-                    } else password = passwordToken.getBytes(StandardCharsets.UTF_8);
+                    } else {
+                        password = passwordToken.getBytes(StandardCharsets.UTF_8);
+                        incorrectUsage = false;
+                    }
                 } else incorrectUsage = false;
             }
         }
