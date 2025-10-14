@@ -1,8 +1,16 @@
 package com.github.onran0.passer.util;
 
+import com.github.onran0.passer.security.RuntimeSecurity;
+
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 
 public final class Convert {
+
+    private static final CharsetEncoder UTF_ENCODER = StandardCharsets.UTF_8.newEncoder();
 
     public static byte[] getBinaryFromHex(String hex) {
         return getBinaryFromHex(hex.toCharArray());
@@ -31,5 +39,21 @@ public final class Convert {
 
     public static byte[] getUTF8Bytes(String s) {
         return s.getBytes(StandardCharsets.UTF_8);
+    }
+
+    public static byte[] getUTF8Bytes(char[] s) {
+        try {
+            ByteBuffer buf = UTF_ENCODER.encode(CharBuffer.wrap(s));
+
+            byte[] bytes = new byte[buf.remaining()];
+            buf.get(bytes);
+
+            RuntimeSecurity.clear(buf);
+
+            return bytes;
+        } catch (CharacterCodingException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
