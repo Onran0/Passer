@@ -49,9 +49,34 @@ public class Main {
 
     private void help() {
         out.println("commands: help, usage, make, hmake, open, hopen, list, info, copy, add, rem, mod, save, close, recent, exit");
+        out.println(
+                """
+                help - shows a list of all commands and their descriptions
+                usage - shows the format of arguments and sometimes a more detailed description of a specific command
+                make - create a new password storage
+                hmake - create a new password storage with a binary master password
+                open - open password storage
+                hopen - open the password storage with a binary master password
+                list - displays a list with information about all passwords in the storage
+                info - shows information about a specific password
+                copy - copies a specific password to the clipboard and erases it after a minute
+                add - adds a new password to the storage
+                rem - removes a password from the storage
+                mod - modifies password information
+                save - saves password storage
+                close - closes the current password storage
+                recent - shows a list of the last 10 opened password storages
+                exit - terminates the program
+                """
+        );
     }
 
     private void usage() {
+        if(tokensRemain() < 0) {
+            out.println(RED + "pass the command name as an argument" + RESET);
+            return;
+        }
+
         usage(nextToken());
     }
 
@@ -82,22 +107,26 @@ public class Main {
             case "hmake":
             case "open":
             case "hopen":
-                usage = "<path:str>\n";
+                usage = "<path:str>";
                 break;
 
             case "add":
-                usage = "<caption:str> <type:str:[text|bin]> [optional] <pass:str>\n";
-                usage += "Omit the third argument if you want to delegate password generation to Passer using cryptographically strong randomness.\n";
-                usage += "Pass the HEX string in the third argument if you selected the \"bin\" password type and passed the password manually.";
+                usage = "<caption:str> <type:str:[text|bin]> [optional] <auto-password-gen:bool>\n";
+                usage += "pass true as the third argument if you want to delegate password generation to passer using cryptographically strong randomness.";
                 break;
 
             case "mod":
-                usage = "<password id:int> <new caption:str>";
+                usage = "<password id:int> <property name:str> <new value:var>\n";
+                usage += "Available properties:\n";
+                usage += "caption:str - password title.\n";
+                usage += "service:str - the service for which this password is intended.\n";
+                usage += "login:str - login for the service and this password.\n";
+                usage += "password:[optional] bool - the password itself. pass true to the third argument for automatic generation.";
                 break;
         }
 
         if(usage != null)
-            out.printf("usage: %s %s\n", commandName, usage);
+            out.printf("usage: %s %s\n\n", commandName, usage);
         else
             out.printf("unknown command \"%s\"\n", commandName);
     }
@@ -130,7 +159,7 @@ public class Main {
         if(passesFile.exists())
             out.println(RED + "file already exists" + RESET);
         else {
-            final char[] password = requestPassword();
+            final char[] password = requestPassword(passInHex);
 
             this.masterPassword = new SecuredCharArray(
                     passInHex
@@ -173,7 +202,7 @@ public class Main {
         if(!passesFile.exists())
             out.println(RED + "file does not exist" + RESET);
         else {
-            final char[] password = requestPassword();
+            final char[] password = requestPassword(passInHex);
 
             this.masterPassword = new SecuredCharArray(
                     passInHex
@@ -345,18 +374,20 @@ public class Main {
             };
 
             if(type != null) {
-                if(tokensRemain() > 0) {
-                    String passwordToken = nextToken();
+                if(tokensRemain() > 0 && Boolean.parseBoolean(nextToken())) {
+                    char[] passwordInput = requestPassword(type == PasswordType.BINARY);
 
                     if(type == PasswordType.BINARY) {
                         try {
-                            password = Convert.getBinaryFromHex(passwordToken);
+                            password = Convert.getBinaryFromHex(passwordInput);
                             incorrectUsage = false;
                         } catch(NumberFormatException ignored) {}
                     } else {
-                        password = passwordToken.getBytes(StandardCharsets.UTF_8);
+                        password = Convert.getUTF8Bytes(passwordInput);
                         incorrectUsage = false;
                     }
+
+                    RuntimeSecurity.clear(passwordInput);
                 } else incorrectUsage = false;
             }
         }
@@ -394,6 +425,8 @@ public class Main {
 
         this.passes.getPasses().add(new PasswordInfo(
                 caption.toCharArray(),
+                PasserCore.MISSING_PROPERTY_DEFAULT.clone(),
+                PasserCore.MISSING_PROPERTY_DEFAULT.clone(),
                 new int[] { type.ordinal() },
                 password,
                 new long[] { creationTime },
@@ -581,8 +614,11 @@ public class Main {
 
     }
 
-    private char[] requestPassword() {
-        return console.readPassword("enter password: ");
+    private char[] requestPassword(boolean hex) {
+        if(!hex)
+            return console.readPassword("enter password: ");
+        else
+            return console.readPassword("enter password in hex: ");
     }
 
     private int tokensRemain() {

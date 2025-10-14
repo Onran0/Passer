@@ -5,22 +5,16 @@ import com.github.onran0.passer.core.Passes;
 import com.github.onran0.passer.crypto.*;
 import com.github.onran0.passer.security.RuntimeSecurity;
 import com.github.onran0.passer.security.SecuredCharArray;
-import com.github.onran0.passer.util.Convert;
 
-import static com.github.onran0.passer.core.Passes.*;
+import static com.github.onran0.passer.core.PasserCore.*;
 
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class PassesReader {
 
-    private static final CharsetDecoder UTF_DECODER = StandardCharsets.UTF_8.newDecoder();
     private final DataInputStream in;
 
     public PassesReader(InputStream in) {
@@ -28,11 +22,11 @@ public final class PassesReader {
     }
 
     public Passes read(final SecuredCharArray masterPassword) throws IOException, GeneralSecurityException {
-        in.readNBytes(SharedConstants.MAGIC.length);
+        in.readNBytes(SharedFunctional.MAGIC.length);
 
         final int version = in.readUnsignedShort();
 
-        if(version != V_0)
+        if(version > V_1)
             throw new UnsupportedOperationException("Unsupported passes file version: " + version);
 
         final String kdfAlgorithm = in.readUTF();
@@ -80,24 +74,26 @@ public final class PassesReader {
         int pairsCount = decryptedDataInput.readInt();
 
         for (int i = 0; i < pairsCount; i++) {
-            byte[] captionBytes = decryptedDataInput.readNBytes(decryptedDataInput.readUnsignedShort());
-
-            CharBuffer captionBuffer = UTF_DECODER.decode(ByteBuffer.wrap(captionBytes));
-
-            RuntimeSecurity.clear(captionBytes);
-
-            char[] caption = new char[captionBuffer.remaining()];
-            captionBuffer.get(caption);
-
-            RuntimeSecurity.clear(captionBuffer);
+            char[] caption = SharedFunctional.readUTFSecured(decryptedDataInput);
 
             int[] passwordType = { decryptedDataInput.readUnsignedByte() };
             byte[] password = decryptedDataInput.readNBytes(decryptedDataInput.readInt());
             long[] creationTime = { decryptedDataInput.readLong() };
-            long[] lastUpdateTime = { decryptedDataInput.readLong() };
+            long[] modificationTime = { decryptedDataInput.readLong() };
+
+            char[] service;
+            char[] login;
+
+            if(version > V_0) {
+                service = SharedFunctional.readUTFSecured(decryptedDataInput);
+                login = SharedFunctional.readUTFSecured(decryptedDataInput);
+            } else {
+                service = MISSING_PROPERTY_DEFAULT.clone();
+                login = MISSING_PROPERTY_DEFAULT.clone();
+            }
 
             passwordInfos.add(new PasswordInfo(
-                caption, passwordType, password, creationTime, lastUpdateTime
+                caption, service, login, passwordType, password, creationTime, modificationTime
             ));
         }
 

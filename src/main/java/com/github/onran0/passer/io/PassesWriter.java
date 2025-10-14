@@ -5,32 +5,42 @@ import com.github.onran0.passer.core.Passes;
 import com.github.onran0.passer.crypto.*;
 import com.github.onran0.passer.security.RuntimeSecurity;
 import com.github.onran0.passer.security.SecuredCharArray;
-import com.github.onran0.passer.util.Convert;
 
-import static com.github.onran0.passer.core.Passes.*;
+import static com.github.onran0.passer.core.PasserCore.*;
 
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 
 public final class PassesWriter {
 
+    private static final int DEFAULT_STORE_VERSION = V_1;
+
     private static final int KDF_ITERATIONS = 2_000_000;
     private static final int CIPHER_KEY_SIZE = 256;
 
-    private static final CharsetEncoder UTF_ENCODER = StandardCharsets.UTF_8.newEncoder();
-
+    private final int version;
     private final DataOutputStream out;
     private final ISymmetricCipher cipher;
     private final IKDF kdf;
 
-    public PassesWriter(final OutputStream out, final String cipherAlgorithm, final String kdfAlgorithm) {
+    public PassesWriter(
+            final OutputStream out,
+            final String cipherAlgorithm,
+            final String kdfAlgorithm
+    ) {
+        this(out, cipherAlgorithm, kdfAlgorithm, DEFAULT_STORE_VERSION);
+    }
+
+    public PassesWriter(
+            final OutputStream out,
+            final String cipherAlgorithm,
+            final String kdfAlgorithm,
+            final int version
+    ) {
         this.out = new DataOutputStream(out);
         this.cipher = CryptoFactory.getSymmetricCipherInstance(cipherAlgorithm);
         this.kdf = CryptoFactory.getKDFInstance(kdfAlgorithm);
+        this.version = version;
     }
 
     public void write(final Passes passes, final SecuredCharArray masterPassword) throws IOException, GeneralSecurityException {
@@ -59,8 +69,8 @@ public final class PassesWriter {
 
         cipher.setKey(key);
 
-        out.write(SharedConstants.MAGIC);
-        out.writeShort((short) V_0);
+        out.write(SharedFunctional.MAGIC);
+        out.writeShort((short) version);
         out.writeUTF(kdf.getID());
         out.write(kdf.getSalt());
         out.writeInt(kdf.getIterations());
@@ -76,31 +86,23 @@ public final class PassesWriter {
         encryptedOutputData.writeInt(passes.getPasses().size());
 
         for(PasswordInfo passwordInfo : passes.getPasses()) {
-            char[] captionChars = passwordInfo.getCaption();
-
-            ByteBuffer captionBuf = UTF_ENCODER.encode(CharBuffer.wrap(captionChars));
-
-            RuntimeSecurity.clear(captionChars);
-
-            byte[] captionBytes = new byte[captionBuf.remaining()];
-            captionBuf.get(captionBytes);
-
-            RuntimeSecurity.clear(captionBuf);
-
             int[] passwordType = passwordInfo.getType();
             byte[] password = passwordInfo.getPassword();
             long[] creationTime = passwordInfo.getCreationTime();
             long[] modificationTime = passwordInfo.getModificationTime();
 
-            encryptedOutputData.writeShort((short) captionBytes.length);
-            encryptedOutputData.write(captionBytes);
+            SharedFunctional.writeUTFSecured(encryptedOutputData, passwordInfo.getCaption());
             encryptedOutputData.writeByte(passwordType[0]);
             encryptedOutputData.writeInt(password.length);
             encryptedOutputData.write(password);
             encryptedOutputData.writeLong(creationTime[0]);
             encryptedOutputData.writeLong(modificationTime[0]);
 
-            RuntimeSecurity.clear(captionBytes);
+            if(version > V_0) {
+                SharedFunctional.writeUTFSecured(encryptedOutputData, passwordInfo.getService());
+                SharedFunctional.writeUTFSecured(encryptedOutputData, passwordInfo.getLogin());
+            }
+
             RuntimeSecurity.clear(passwordType);
             RuntimeSecurity.clear(password);
             RuntimeSecurity.clear(creationTime);
