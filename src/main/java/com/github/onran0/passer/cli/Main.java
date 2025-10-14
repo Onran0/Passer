@@ -229,17 +229,50 @@ public class Main {
         if(checkNotOpen())
             return;
 
+        final int ID_LENGTH = 5;
+        final int CAPTION_LENGTH = 40;
+        final int LOGIN_LENGTH = 25;
+
+        System.out.printf(
+                "%sID%s%s%sCaption%s%s%sLogin%s%s%sService%s\n",
+                CYAN, RESET,
+                " ".repeat(ID_LENGTH),
+                GREEN, RESET,
+                " ".repeat(CAPTION_LENGTH),
+                PURPLE, RESET,
+                " ".repeat(LOGIN_LENGTH),
+                YELLOW, RESET
+        );
+
         for(int i = 0;i < passes.getPasses().size();i++) {
             final PasswordInfo passwordInfo = passes.getPasses().get(i);
 
             char[] caption = passwordInfo.getCaption();
+            char[] service = passwordInfo.getService();
+            char[] login = passwordInfo.getLogin();
 
-            for (char c : caption)
-                out.print(c);
+            // TODO: do something with magic numbers
 
-            out.printf(" (ID: %d)\n", i);
+            System.out.printf("%d%s",
+                    i,
+                    " ".repeat(ID_LENGTH - ((int) Math.log10(Math.max(1, i))) + 1)
+            );
+            System.out.print(caption);
+            System.out.print(" ".repeat(
+                    CAPTION_LENGTH - caption.length + 7
+            ));
+            System.out.print(login);
+            System.out.print(" ".repeat(
+                    LOGIN_LENGTH - login.length + 5
+            ));
+            System.out.print(service);
+            System.out.println();
+
+            //
 
             RuntimeSecurity.clear(caption);
+            RuntimeSecurity.clear(login);
+            RuntimeSecurity.clear(service);
         }
     }
 
@@ -268,16 +301,22 @@ public class Main {
         PasswordInfo passwordInfo = passes.getPasses().get(id);
 
         char[] caption = passwordInfo.getCaption();
+        char[] login = passwordInfo.getLogin();
+        char[] service = passwordInfo.getService();
+
         int[] type = passwordInfo.getType();
         long[] creationTime = passwordInfo.getCreationTime();
         long[] modificationTime = passwordInfo.getModificationTime();
+        PasswordType typeEnum = PasswordType.fromID(type[0]);
 
         out.print("caption: ");
+        out.print(caption);
 
-        for(char c : caption)
-            out.print(c);
+        out.print("\nlogin: ");
+        out.print(login);
 
-        PasswordType typeEnum = PasswordType.fromID(type[0]);
+        out.print("\nservice: ");
+        out.print(service);
 
         out.print("\npassword type: " + (typeEnum == null ? "undefined" : typeEnum.getName()));
 
@@ -285,7 +324,10 @@ public class Main {
         out.printf("\nmodification time: %d", modificationTime[0]);
         out.println();
 
+        typeEnum = null;
         RuntimeSecurity.clear(caption);
+        RuntimeSecurity.clear(service);
+        RuntimeSecurity.clear(login);
         RuntimeSecurity.clear(type);
         RuntimeSecurity.clear(creationTime);
         RuntimeSecurity.clear(modificationTime);
