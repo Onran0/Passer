@@ -78,6 +78,8 @@ Download the latest release from the **Releases** section.
 
 Requires **Java Runtime Environment 17** or later.
 
+You can run the program using the command `java -jar Passes.jar`
+
 ## Example usage
 
 ```cmd
