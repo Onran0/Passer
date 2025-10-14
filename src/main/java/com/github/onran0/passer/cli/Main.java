@@ -489,6 +489,8 @@ public class Main {
                     masterPassword
             );
 
+            out.println("file successfully saved");
+
             fileSaved = true;
         } catch(IOException | GeneralSecurityException e) {
             out.println(RED + "failed to save file: " + RESET);
@@ -509,6 +511,8 @@ public class Main {
         this.passes = null;
         this.fileSaved = false;
         this.openedFile = null;
+
+        out.println("file closed");
     }
 
     private void recent() {
