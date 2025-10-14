@@ -18,9 +18,7 @@ import java.security.GeneralSecurityException;
 
 public final class PassesWriter {
 
-    private static final int MAGIC = 0x49505352;
-
-    private static final int KDF_ITERATIONS = 1_000_000;
+    private static final int KDF_ITERATIONS = 2_000_000;
     private static final int CIPHER_KEY_SIZE = 256;
 
     private static final CharsetEncoder UTF_ENCODER = StandardCharsets.UTF_8.newEncoder();
