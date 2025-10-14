@@ -10,6 +10,11 @@ import java.util.*;
 import java.util.prefs.Preferences;
 
 public final class PasserCore {
+    public static final char[] MISSING_PROPERTY_DEFAULT = "Not set".toCharArray();
+
+    public static final int V_0 = 0;
+    public static final int V_1 = 1;
+
     private static final Preferences PREFERENCES = Preferences.userNodeForPackage(PasserCore.class);
 
     private final List<File> recentPassesFiles = new ArrayList<>();

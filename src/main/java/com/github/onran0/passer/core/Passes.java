@@ -5,8 +5,6 @@ import java.util.List;
 
 public final class Passes {
 
-    public static final int V_0 = 0;
-
     private final List<PasswordInfo> passwordInfos;
 
     public Passes() {
