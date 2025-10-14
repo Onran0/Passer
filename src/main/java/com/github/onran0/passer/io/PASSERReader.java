@@ -13,11 +13,11 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class PassesReader {
+public final class PASSERReader {
 
     private final DataInputStream in;
 
-    public PassesReader(InputStream in) {
+    public PASSERReader(InputStream in) {
         this.in = new DataInputStream(in);
     }
 

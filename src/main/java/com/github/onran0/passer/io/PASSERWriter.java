@@ -11,7 +11,7 @@ import static com.github.onran0.passer.core.PasserCore.*;
 import java.io.*;
 import java.security.GeneralSecurityException;
 
-public final class PassesWriter {
+public final class PASSERWriter {
 
     private static final int DEFAULT_STORE_VERSION = V_1;
 
@@ -23,7 +23,7 @@ public final class PassesWriter {
     private final ISymmetricCipher cipher;
     private final IKDF kdf;
 
-    public PassesWriter(
+    public PASSERWriter(
             final OutputStream out,
             final String cipherAlgorithm,
             final String kdfAlgorithm
@@ -31,7 +31,7 @@ public final class PassesWriter {
         this(out, cipherAlgorithm, kdfAlgorithm, DEFAULT_STORE_VERSION);
     }
 
-    public PassesWriter(
+    public PASSERWriter(
             final OutputStream out,
             final String cipherAlgorithm,
             final String kdfAlgorithm,

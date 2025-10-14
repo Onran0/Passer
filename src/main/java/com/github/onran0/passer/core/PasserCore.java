@@ -1,7 +1,7 @@
 package com.github.onran0.passer.core;
 
-import com.github.onran0.passer.io.PassesReader;
-import com.github.onran0.passer.io.PassesWriter;
+import com.github.onran0.passer.io.PASSERReader;
+import com.github.onran0.passer.io.PASSERWriter;
 import com.github.onran0.passer.security.SecuredCharArray;
 
 import java.io.*;
@@ -48,7 +48,7 @@ public final class PasserCore {
         Passes passes;
 
         try(var in = new FileInputStream(file)) {
-            passes = new PassesReader(in).read(masterPassword);
+            passes = new PASSERReader(in).read(masterPassword);
         }
 
         return passes;
@@ -62,7 +62,7 @@ public final class PasserCore {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        new PassesWriter(baos, cipherAlgorithm, kdfAlgorithm).write(passes, masterPassword);
+        new PASSERWriter(baos, cipherAlgorithm, kdfAlgorithm).write(passes, masterPassword);
 
 
         FileOutputStream fos = new FileOutputStream(file);
