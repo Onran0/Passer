@@ -49,6 +49,8 @@ public final class RuntimeSecurity {
             Arrays.fill(ia, 0);
         else if (o instanceof long[] la)
             Arrays.fill(la, 0);
+        else if (o instanceof boolean[] ba)
+            Arrays.fill(ba, false);
         else if (o instanceof ByteBuffer bb) {
             bb.clear();
 
