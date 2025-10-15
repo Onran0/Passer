@@ -105,9 +105,13 @@ public class Main {
 
             case "make":
             case "hmake":
+                usage = "<path:str>";
+                break;
+
             case "open":
             case "hopen":
-                usage = "<path:str>";
+                usage = "<path:str>\n";
+                usage += "pass the path to the file in the first argument, or an asterisk if you want to open the latest recent file.";
                 break;
 
             case "add":
@@ -197,7 +201,18 @@ public class Main {
 
         final String path = nextToken();
 
-        File passesFile = new File(path);
+        File passesFile;
+
+        if("*".equals(path)) {
+            List<File> recentFiles = core.getRecentPassesFiles();
+
+            if(recentFiles.isEmpty()) {
+                out.println(RED + "you have not opened any file before or the last opened file was deleted" + RESET);
+                return;
+            }
+
+            passesFile = recentFiles.get(recentFiles.size() - 1);
+        } else passesFile = new File(path);
 
         if(!passesFile.exists())
             out.println(RED + "file does not exist" + RESET);
@@ -416,7 +431,7 @@ public class Main {
             };
 
             if(type != null) {
-                if(tokensRemain() > 0 && Boolean.parseBoolean(nextToken())) {
+                if(tokensRemain() < 0 || !Boolean.parseBoolean(nextToken())) {
                     char[] passwordInput = requestPassword(type == PasswordType.BINARY);
 
                     if(type == PasswordType.BINARY) {
@@ -626,6 +641,11 @@ public class Main {
             out.write(YELLOW);
             parseTokens(console.readLine(">> "));
             out.write(RESET);
+
+            if(tokensRemain() == 0) {
+                out.println(RED + "enter the command" + RESET);
+                continue;
+            }
 
             String command = nextToken();
 
