@@ -33,10 +33,7 @@ public final class PasserCore {
     }
 
     public void addPassesFileToRecent(File file) {
-        for(File recent : recentPassesFiles) {
-            if (recent.getAbsolutePath().equals(file.getAbsolutePath()))
-                return;
-        }
+        recentPassesFiles.removeIf(recent -> recent.getAbsolutePath().equals(file.getAbsolutePath()));
 
         recentPassesFiles.add(file);
 
