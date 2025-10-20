@@ -14,6 +14,7 @@ public final class PasserCore {
 
     public static final int V_0 = 0;
     public static final int V_1 = 1;
+    public static final int V_2 = 2;
 
     private static final Preferences PREFERENCES = Preferences.userNodeForPackage(PasserCore.class);
 
