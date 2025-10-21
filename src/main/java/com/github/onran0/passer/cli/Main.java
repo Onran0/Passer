@@ -473,6 +473,8 @@ public class Main {
                     password = extractBytesFromInputPassword(passwordInput, new int[] { type.getID() });
 
                     RuntimeSecurity.clear(passwordInput);
+
+                    incorrectUsage = password == null;
                 } else incorrectUsage = false;
             }
         }
