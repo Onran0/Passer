@@ -20,6 +20,15 @@ public enum PasswordType {
         return name;
     }
 
+    public static PasswordType fromName(String name) {
+        for (PasswordType p : PasswordType.values()) {
+            if (p.getName().equals(name))
+                return p;
+        }
+
+        return null;
+    }
+
     public static PasswordType fromID(int id) {
         for (PasswordType p : PasswordType.values()) {
             if (p.getID() == id)
