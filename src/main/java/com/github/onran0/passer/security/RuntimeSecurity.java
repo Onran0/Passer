@@ -4,10 +4,14 @@ import com.github.onran0.passer.crypto.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+
 import java.nio.charset.StandardCharsets;
+
 import java.security.GeneralSecurityException;
+
 import java.util.Arrays;
 
 public final class RuntimeSecurity {

@@ -121,4 +121,4 @@ file closed
 
 This section will be expanded later.
 
-You can build the program in **IntelliJ IDEA** by cloning the repository, creating a new artifact, and setting the main class to `com.github.onran0.passer.cli.Main`.
+You can build the program in **IntelliJ IDEA** by cloning the repository, creating a new artifact, and setting the main class to `com.github.onran0.passer.cli.PasserCLI`.
