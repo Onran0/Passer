@@ -1,20 +1,20 @@
 package com.github.onran0.passer.cli.commands;
 
 import com.github.onran0.passer.cli.commands.core.Command;
+import com.github.onran0.passer.cli.commands.core.NonOptionArgumentsParser;
+
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
 public class HelpCommand extends Command {
 
     @Override
-    protected void initializeParser(OptionParser parser) {}
+    protected void initializeParser(OptionParser parser, NonOptionArgumentsParser arguments) {}
 
     @Override
-    public void execute(OptionSet options) {
-        super.execute(options);
-
-        getOut().println("commands: help, usage, make, hmake, open, hopen, list, info, copy, add, rem, mod, save, close, recent, exit");
-        getOut().println(
+    protected void execute(OptionSet options) {
+        out().println("commands: help, usage, make, open, list, info, copy, add, rem, mod, save, close, recent, exit");
+        out().println(
                 """
                 help - shows a list of all commands and their descriptions
                 usage - shows the format of arguments and sometimes a more detailed description of a specific command
