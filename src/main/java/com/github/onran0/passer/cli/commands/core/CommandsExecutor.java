@@ -60,7 +60,7 @@ public final class CommandsExecutor {
         Command command = commands.get(executingCommand = tokens.remove(0));
 
         if(command == null)
-            invalidUsage("undefined command \"" + executingCommand + "\"");
+            out.println(RED + "undefined command \"" + executingCommand + "\"" + RESET);
         else {
             command.setCore(core);
             command.setOutput(out);
