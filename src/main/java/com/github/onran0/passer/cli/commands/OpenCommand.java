@@ -24,7 +24,7 @@ public class OpenCommand extends PasswordBasedCommand {
 
     @Override
     protected void initializeParser(OptionParser parser, NonOptionArgumentsParser arguments) {
-        arguments.addArgument("filepath", String.class, "path to file", false);
+        arguments.defineArgument("filepath", String.class, "path to file", false);
 
         parser.acceptsAll(Arrays.asList("l", "last"), "Open the last opened file");
         parser.acceptsAll(Arrays.asList("h", "hex"), "Specify password type is HEX");

@@ -40,23 +40,25 @@ public final class NonOptionArgumentsParser {
             var arg = args.get(i);
             var argInfo = this.definedArgs.get(i);
 
-            Method method;
+            if(argInfo.type != String.class) {
+                Method method;
 
-            try {
-                method = argInfo.type.getMethod("valueOf", String.class);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
+                try {
+                    method = argInfo.type.getMethod("valueOf", String.class);
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
 
-            try {
-                arguments.add(method.invoke(null, arg));
-            } catch (Exception e) {
-                throw new InvalidArgumentValue(arg, e);
-            }
+                try {
+                    arguments.add(method.invoke(null, arg));
+                } catch (Exception e) {
+                    throw new InvalidArgumentValue(arg, e);
+                }
+            } else arguments.add(arg);
         }
     }
 
-    public void addArgument(String name, Class<?> type, String desc, boolean required) {
+    public void defineArgument(String name, Class<?> type, String desc, boolean required) {
         if(required && !definedArgs.isEmpty() && !definedArgs.get(definedArgs.size() - 1).required)
             throw new IllegalArgumentException("The previous argument must be mandatory in order to make this argument mandatory");
 

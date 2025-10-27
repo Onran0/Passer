@@ -29,7 +29,7 @@ public class CopyCommand extends Command {
 
     @Override
     protected void initializeParser(OptionParser parser, NonOptionArgumentsParser arguments) {
-        arguments.addArgument("id", Integer.class, "Password ID", true);
+        arguments.defineArgument("id", Integer.class, "Password ID", true);
     }
 
     @Override
