@@ -78,7 +78,7 @@ public class PasserCore {
 
         // guarantee of file integrity in case of an exception
 
-        try(FileOutputStream fos = new FileOutputStream(openedFile)) {
+        try(FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(baos.toByteArray());
         }
     }
