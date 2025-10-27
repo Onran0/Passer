@@ -9,8 +9,10 @@ import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.prefs.Preferences;
 
-public final class PasserCore {
+public class PasserCore {
+
     public static final char[] MISSING_PROPERTY_DEFAULT = "Not set".toCharArray();
+    public static final int RECENT_FILES_COUNT = 10;
 
     public static final int V_0 = 0;
     public static final int V_1 = 1;
@@ -21,6 +23,11 @@ public final class PasserCore {
     private final List<File> recentPassesFiles = new ArrayList<>();
     private final ClipboardEraseThread clipboardEraseThread = new ClipboardEraseThread();
 
+    private File openedFile;
+    private SecuredCharArray masterPassword;
+    private Passes passes;
+    private boolean fileSaved;
+
     public void eraseClipboardAfter(long ms) {
         clipboardEraseThread.eraseAfter(ms);
     }
@@ -29,45 +36,74 @@ public final class PasserCore {
         return Collections.unmodifiableList(recentPassesFiles);
     }
 
-    public void removePassesFileFromRecent(File file) {
-        recentPassesFiles.removeIf(file::equals);
+    public void createFile(File file, SecuredCharArray masterPassword, String cipherAlgorithm, String kdfAlgorithm) throws IOException, GeneralSecurityException {
+        writeFile(file, passes = new Passes(), masterPassword, cipherAlgorithm, kdfAlgorithm);
+
+        openFile(file, masterPassword, false);
     }
 
-    public void addPassesFileToRecent(File file) {
+    public void openFile(File file, SecuredCharArray masterPassword) throws IOException, GeneralSecurityException {
+        openFile(file, masterPassword, true);
+    }
+
+    private void openFile(File file, SecuredCharArray masterPassword, boolean doRead) throws IOException, GeneralSecurityException {
+        if(doRead) {
+            try(var in = new FileInputStream(file)) {
+                this.passes = new PASSERReader(in).read(masterPassword);
+            }
+        }
+
+        this.openedFile = file;
+        this.masterPassword = masterPassword;
+        this.fileSaved = true;
+
         recentPassesFiles.removeIf(recent -> recent.getAbsolutePath().equals(file.getAbsolutePath()));
 
         recentPassesFiles.add(file);
 
-        while(recentPassesFiles.size() > 10)
+        while(recentPassesFiles.size() > RECENT_FILES_COUNT)
             recentPassesFiles.remove(0);
     }
 
-    public Passes getPassesForFile(File file, SecuredCharArray masterPassword) throws IOException, GeneralSecurityException {
-        Passes passes;
+    public void saveFile(String cipherAlgorithm, String kdfAlgorithm) throws IOException, GeneralSecurityException {
+        writeFile(openedFile, passes, masterPassword, cipherAlgorithm, kdfAlgorithm);
 
-        try(var in = new FileInputStream(file)) {
-            passes = new PASSERReader(in).read(masterPassword);
-        }
-
-        return passes;
+        fileSaved = true;
     }
 
-    public void setPassesForFile(
-            File file, Passes passes,
-            String cipherAlgorithm, String kdfAlgorithm,
-            SecuredCharArray masterPassword
-    ) throws IOException, GeneralSecurityException {
-
+    private void writeFile(File file, Passes passes, SecuredCharArray masterPassword, String cipherAlgorithm, String kdfAlgorithm) throws IOException, GeneralSecurityException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         new PASSERWriter(baos, cipherAlgorithm, kdfAlgorithm).write(passes, masterPassword);
 
+        // guarantee of file integrity in case of an exception
 
-        FileOutputStream fos = new FileOutputStream(file);
+        try(FileOutputStream fos = new FileOutputStream(openedFile)) {
+            fos.write(baos.toByteArray());
+        }
+    }
 
-        fos.write(baos.toByteArray());
+    public void closeFile() {
+        openedFile = null;
+        masterPassword = null;
+        passes = null;
+        fileSaved = true;
+    }
 
-        fos.close();
+    public File getOpenedFile() {
+        return openedFile;
+    }
+
+    public Passes getPasses() {
+        return passes;
+    }
+
+    public boolean isSaved() {
+        return fileSaved;
+    }
+
+    public void setUnsaved() {
+        this.fileSaved = false;
     }
 
     public void start() {
