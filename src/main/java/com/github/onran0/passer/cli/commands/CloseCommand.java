@@ -26,7 +26,7 @@ public class CloseCommand extends Command {
     @Override
     protected void execute(OptionSet options) {
         if(!getCore().isSaved() && !options.has("forced")) {
-            out().println(RED + "to close a file without saving, you need to set the \"forced\" argument to true" + RESET);
+            out().println(RED + "to close a file without saving, you need to specify -f/--forced option" + RESET);
             return;
         }
 
