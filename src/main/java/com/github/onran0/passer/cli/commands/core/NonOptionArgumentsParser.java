@@ -78,19 +78,62 @@ public final class NonOptionArgumentsParser {
             var sb = new StringBuilder();
 
             if(!definedArgs.isEmpty()) {
-                sb.append("Argument      Description\n--------      -----------\n");
+                int maxLengthOfName = 0;
+                boolean hasRequired = false;
 
-                for(var arg : definedArgs) {
-                    sb.append("[");
-                    sb.append(arg.name);
-                    sb.append("] ");
-                    sb.append(" ".repeat(DESIRED_COLUMN_SEPARATOR_WIDTH));
-                    sb.append(arg.desc);
-                    sb.append('\n');
+                var names = new String[definedArgs.size()];
+
+                for(int i = 0;i < names.length;i++) {
+                    var arg = definedArgs.get(i);
+
+                    var name = arg.required ? "*" : "";
+
+                    if(arg.required)
+                        hasRequired = true;
+
+                    name += arg.name;
+                    name += " <";
+                    name += arg.type.getSimpleName();
+                    name += ">";
+
+                    if(name.length() > maxLengthOfName)
+                        maxLengthOfName = name.length();
+
+                    names[i] = name;
                 }
 
+                var firstColumnName = "Argument";
+
+                if(hasRequired)
+                    firstColumnName += " (* = required)";
+
+                sb.append(firstColumnName);
+
+                var descIndent = " ".repeat(Math.max(maxLengthOfName, firstColumnName.length()) - firstColumnName.length() + DESIRED_COLUMN_SEPARATOR_WIDTH);
+
+                sb.append(descIndent);
+
+                var secondColumnName = "Description";
+
+                sb.append(secondColumnName);
+
                 sb.append('\n');
-            }
+
+                sb.append("-".repeat(firstColumnName.length()));
+                sb.append(descIndent);
+                sb.append("-".repeat(secondColumnName.length()));
+
+                sb.append('\n');
+
+                for(int i = 0;i < definedArgs.size();i++) {
+                    sb.append(names[i]);
+                    sb.append(" ".repeat(Math.max(maxLengthOfName, firstColumnName.length()) - names[i].length() + DESIRED_COLUMN_SEPARATOR_WIDTH));
+                    sb.append(definedArgs.get(i).desc);
+                    sb.append('\n');
+                }
+            } else sb.append("No arguments specified");
+
+            sb.append('\n');
 
             sb.append(builtin.format(options));
 
