@@ -24,6 +24,7 @@ public class PasserCLI extends PasserCore {
         executor.addCommand("usage", new UsageCommand(executor));
 
         executor.addCommand("help", new HelpCommand());
+        executor.addCommand("version", new VersionCommand());
         executor.addCommand("make", new MakeCommand());
         executor.addCommand("open", new OpenCommand());
         executor.addCommand("list", new ListCommand());

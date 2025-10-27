@@ -13,10 +13,11 @@ public class HelpCommand extends Command {
 
     @Override
     protected void execute(OptionSet options) {
-        out().println("commands: help, usage, make, open, list, info, copy, add, rem, mod, save, close, recent, exit");
+        out().println("commands: help, version, usage, make, open, list, info, copy, add, rem, mod, save, close, recent, exit\n");
         out().println(
                 """
                 help - shows a list of all commands and their descriptions
+                version - shows the current version of passer
                 usage - shows the format of arguments and sometimes a more detailed description of a specific command
                 make - create a new password storage
                 hmake - create a new password storage with a binary master password
