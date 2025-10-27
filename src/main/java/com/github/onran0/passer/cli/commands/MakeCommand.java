@@ -27,7 +27,7 @@ public class MakeCommand extends PasswordBasedCommand {
 
     @Override
     protected void initializeParser(OptionParser parser, NonOptionArgumentsParser arguments) {
-        arguments.defineArgument("filepath", String.class, "path to file", true);
+        arguments.defineArgument("filepath", String.class, "Path to file", true);
 
         parser.acceptsAll(Arrays.asList("h", "hex"), "Specify password type is HEX");
     }
