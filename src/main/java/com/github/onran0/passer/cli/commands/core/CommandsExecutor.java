@@ -1,6 +1,7 @@
 package com.github.onran0.passer.cli.commands.core;
 
 import com.github.onran0.passer.core.PasserCore;
+import joptsimple.OptionException;
 
 import static com.github.onran0.passer.cli.Colors.RED;
 import static com.github.onran0.passer.cli.Colors.RESET;
@@ -43,8 +44,11 @@ public final class CommandsExecutor {
 
         out.print(RED + "invalid usage: " + RESET);
         out.println(errorMessage);
+        out.println();
 
         if(usage != null && executingCommand != null) {
+            usage.setCore(core);
+            usage.setOutput(out);
             usage.setCommand(executingCommand);
             usage.preExecute(null);
         }
@@ -60,7 +64,27 @@ public final class CommandsExecutor {
         else {
             command.setCore(core);
             command.setOutput(out);
-            command.preExecute(command.getParser().parse(tokens.toArray(new String[0])));
+
+            try {
+                command.preExecute(command.getParser().parse(tokens.toArray(new String[0])));
+            } catch(NotEnoughMandatoryArguments e) {
+                var sb = new StringBuilder("skipped required arguments: ");
+
+                var args = e.getArguments();
+
+                for(int i = 0;i < args.length;i++) {
+                    sb.append(args[i]);
+
+                    if(i != args.length - 1)
+                        sb.append(", ");
+                }
+
+                invalidUsage(sb.toString());
+            } catch(OptionException e) {
+                invalidUsage(e.getMessage().toLowerCase());
+            } catch(InvalidArgumentValue e) {
+                invalidUsage("invalid argument value: " + e.getMessage());
+            }
         }
 
         executingCommand = null;

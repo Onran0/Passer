@@ -83,7 +83,8 @@ public abstract class Command {
             return;
         }
 
-        argumentsParser.parse(options);
+        if(options != null)
+            argumentsParser.parse(options);
 
         execute(options);
     }
