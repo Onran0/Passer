@@ -13,7 +13,7 @@ public class HelpCommand extends Command {
 
     @Override
     protected void execute(OptionSet options) {
-        out().println("commands: help, version, usage, make, open, list, info, copy, add, rem, mod, save, close, recent, exit\n\n");
+        out().println("commands: help, version, usage, make, open, list, info, copy, add, rem, mod, mred, save, close, recent, exit\n\n");
         out().println(
                 """
                 help - shows a list of all commands and their descriptions
@@ -41,6 +41,8 @@ public class HelpCommand extends Command {
                 rem - removes a password from the storage
                 
                 mod - modifies password information
+                
+                mred - change master password
                 
                 save - saves password storage
                 
