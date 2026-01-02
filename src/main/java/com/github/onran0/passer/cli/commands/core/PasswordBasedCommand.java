@@ -11,10 +11,14 @@ public abstract class PasswordBasedCommand extends Command {
     private static final String PRINTABLE_ASCII = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
     protected char[] requestPassword(boolean hex) {
+        return requestPassword(hex, "enter password");
+    }
+
+    protected char[] requestPassword(boolean hex, String text) {
         if(!hex)
-            return System.console().readPassword("enter password: ");
+            return System.console().readPassword(text + ": ");
         else
-            return System.console().readPassword("enter password in hex: ");
+            return System.console().readPassword(text + " in hex: ");
     }
 
     protected byte[] generatePassword(int[] type) {

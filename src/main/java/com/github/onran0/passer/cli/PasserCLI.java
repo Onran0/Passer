@@ -36,6 +36,7 @@ public class PasserCLI extends PasserCore {
         executor.addCommand("save", new SaveCommand());
         executor.addCommand("close", new CloseCommand());
         executor.addCommand("recent", new RecentCommand());
+        executor.addCommand("mred", new EditMasterPassCommand());
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.github.onran0.passer.io.PASSERWriter;
 import com.github.onran0.passer.security.RuntimeSecurity;
 import com.github.onran0.passer.security.SecuredBool;
 import com.github.onran0.passer.security.SecuredCharArray;
+import com.github.onran0.passer.security.SecurityUtil;
 
 import java.io.*;
 import java.security.GeneralSecurityException;
@@ -76,16 +77,7 @@ public class PasserCore {
         char[] currentDecrypted = this.masterPassword.getDecryptedData();
         char[] oldDecrypted = oldPassword.getDecryptedData();
 
-        boolean currentMatchOld = true;
-
-        if(currentDecrypted.length == oldDecrypted.length) {
-            for(int i = 0;i < currentDecrypted.length;i++) {
-                if(oldDecrypted[i] != currentDecrypted[i]) {
-                    currentMatchOld = false;
-                    break;
-                }
-            }
-        } else currentMatchOld = false;
+       boolean currentMatchOld = SecurityUtil.passwordsAreMatch(currentDecrypted, oldDecrypted);
 
         RuntimeSecurity.clear(currentDecrypted);
         RuntimeSecurity.clear(oldDecrypted);
