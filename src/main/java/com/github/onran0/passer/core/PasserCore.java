@@ -14,7 +14,7 @@ import java.util.prefs.Preferences;
 
 public class PasserCore {
 
-    public static final String VERSION = "0.1.0";
+    public static final String VERSION = "0.2.0";
 
     public static final char[] MISSING_PROPERTY_DEFAULT = "Not set".toCharArray();
     public static final int RECENT_FILES_COUNT = 10;
