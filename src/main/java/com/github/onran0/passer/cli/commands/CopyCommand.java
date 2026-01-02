@@ -71,8 +71,8 @@ public class CopyCommand extends Command {
         RuntimeSecurity.clear(binaryPassword);
         RuntimeSecurity.clear(passTypeRaw);
 
-        out().println("password has been copied to the clipboard and will be erased from there in 1 minute");
+        out().println("password has been copied to the clipboard and will be erased from there in 25 seconds");
 
-        getCore().eraseClipboardAfter(60000);
+        getCore().eraseClipboardAfter(25000);
     }
 }
