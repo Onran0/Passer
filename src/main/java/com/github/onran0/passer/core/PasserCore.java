@@ -2,6 +2,8 @@ package com.github.onran0.passer.core;
 
 import com.github.onran0.passer.io.PASSERReader;
 import com.github.onran0.passer.io.PASSERWriter;
+import com.github.onran0.passer.security.RuntimeSecurity;
+import com.github.onran0.passer.security.SecuredBool;
 import com.github.onran0.passer.security.SecuredCharArray;
 
 import java.io.*;
@@ -65,6 +67,33 @@ public class PasserCore {
 
         while(recentPassesFiles.size() > RECENT_FILES_COUNT)
             recentPassesFiles.remove(0);
+    }
+
+    public void editMasterPassword(SecuredCharArray oldPassword, SecuredCharArray newPassword) throws IOException, GeneralSecurityException {
+        if(openedFile == null)
+            throw new IOException("File is not open");
+
+        char[] currentDecrypted = this.masterPassword.getDecryptedData();
+        char[] oldDecrypted = oldPassword.getDecryptedData();
+
+        boolean currentMatchOld = true;
+
+        if(currentDecrypted.length == oldDecrypted.length) {
+            for(int i = 0;i < currentDecrypted.length;i++) {
+                if(oldDecrypted[i] != currentDecrypted[i]) {
+                    currentMatchOld = false;
+                    break;
+                }
+            }
+        } else currentMatchOld = false;
+
+        RuntimeSecurity.clear(currentDecrypted);
+        RuntimeSecurity.clear(oldDecrypted);
+
+        if(!currentMatchOld)
+            throw new GeneralSecurityException("Current master password and passed old are mismatch");
+
+        this.masterPassword = newPassword;
     }
 
     public void saveFile(String cipherAlgorithm, String kdfAlgorithm) throws IOException, GeneralSecurityException {
