@@ -29,11 +29,10 @@ public final class PBKDF2 implements IKDF {
 
     private byte[] salt;
     private int iterations = -1;
-    private int outputLength = -1;
 
     private void checkInit() {
         if(
-                salt == null || iterations == -1 || outputLength == -1
+                salt == null || iterations == -1
         ) throw new IllegalStateException("Salt, iterations or output length is not initialized");
     }
 
@@ -66,36 +65,22 @@ public final class PBKDF2 implements IKDF {
     }
 
     @Override
-    public void setOutputLength(int outputLength) {
-        this.outputLength = outputLength;
-    }
-
-    @Override
-    public int getOutputLength() {
-        return outputLength;
-    }
-
-    @Override
     public int getSaltLength() {
         return SALT_LENGTH;
     }
 
     @Override
-    public byte[] getDerivedKey(char[] material) {
-        Exception e = null;
-        byte[] key = null;
-
+    public void getDerivedKey(byte[] key, char[] material) {
         try {
-            PBEKeySpec spec = new PBEKeySpec(material, salt, iterations, outputLength);
+            PBEKeySpec spec = new PBEKeySpec(material, salt, iterations, key.length * 8);
             SecretKeyFactory skf = SecretKeyFactory.getInstance(PBKDF2_KDF_ID);
-            key = skf.generateSecret(spec).getEncoded();
-        } catch(Exception e1) {
-            e = e1;
-        }
 
-        if(e != null)
+
+            byte[] gkey = skf.generateSecret(spec).getEncoded();
+
+            System.arraycopy(gkey, 0, key, 0, gkey.length);
+        } catch(Exception e) {
             throw new RuntimeException(e);
-        else
-            return key;
+        }
     }
 }

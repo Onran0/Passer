@@ -35,11 +35,7 @@ public interface IKDF {
 
     int getIterations();
 
-    void setOutputLength(int outputLength);
-
-    int getOutputLength();
-
     int getSaltLength();
 
-    byte[] getDerivedKey(char[] material);
+    void getDerivedKey(byte[] key, char[] material);
 }

@@ -77,11 +77,12 @@ public final class PASSERWriter {
 
         kdf.setSalt(salt);
         kdf.setIterations(KDF_ITERATIONS);
-        kdf.setOutputLength(CIPHER_KEY_SIZE);
 
         char[] decryptedMasterPassword = masterPassword.getDecryptedData();
 
-        byte[] key = kdf.getDerivedKey(decryptedMasterPassword);
+        byte[] key = new byte[CIPHER_KEY_SIZE / 8];
+
+        kdf.getDerivedKey(key, decryptedMasterPassword);
 
         RuntimeSecurity.clear(decryptedMasterPassword);
 

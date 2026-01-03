@@ -66,15 +66,15 @@ public final class PASSERReader {
 
         int keySize = in.readUnsignedShort();
 
-        kdf.setOutputLength(keySize * 8);
-
         final ISymmetricCipher cipher = CryptoFactory.getSymmetricCipherInstance(encryptionAlgorithm);
 
         assert cipher != null;
 
         char[] decryptedMasterPassword = masterPassword.getDecryptedData();
 
-        byte[] key = kdf.getDerivedKey(decryptedMasterPassword);
+        byte[] key = new byte[keySize];
+
+        kdf.getDerivedKey(key, decryptedMasterPassword);
 
         RuntimeSecurity.clear(decryptedMasterPassword);
 
