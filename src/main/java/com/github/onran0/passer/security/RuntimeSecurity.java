@@ -47,8 +47,6 @@ public final class RuntimeSecurity {
             KEY = new byte[KEY_LENGTH];
             CryptoFactory.getSecureRandom().nextBytes(KEY);
         }
-
-        HASHING_ALGORITHM.setHashSize(KEY_LENGTH * 8);
     }
 
     private static byte[] xor(byte[] a, byte[] b) {
@@ -100,15 +98,20 @@ public final class RuntimeSecurity {
 
             result.write(iv);
 
+            byte[] digest = new byte[KEY_LENGTH];
+
+            HASHING_ALGORITHM.digest(additionalMaterial.getBytes(StandardCharsets.UTF_8), digest);
+
             byte[] fkey = xor(
                     key,
-                    HASHING_ALGORITHM.digest(additionalMaterial.getBytes(StandardCharsets.UTF_8))
+                    digest
             );
 
             result.write(CIPHER.encrypt(plaintext, fkey, iv));
 
             clear(fkey);
             clear(iv);
+            clear(digest);
         } catch(IOException | GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
@@ -128,14 +131,20 @@ public final class RuntimeSecurity {
         byte[] plaintext;
 
         try {
+            byte[] digest = new byte[KEY_LENGTH];
+
+            HASHING_ALGORITHM.digest(additionalMaterial.getBytes(StandardCharsets.UTF_8), digest);
+
             byte[] fkey = xor(
                     key,
-                    HASHING_ALGORITHM.digest(additionalMaterial.getBytes(StandardCharsets.UTF_8))
+                    digest
             );
 
             plaintext = CIPHER.decrypt(ciphertext, fkey, iv);
+
             clear(fkey);
             clear(iv);
+            clear(digest);
         } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }

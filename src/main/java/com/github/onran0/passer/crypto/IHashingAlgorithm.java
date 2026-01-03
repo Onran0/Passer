@@ -28,9 +28,7 @@ public interface IHashingAlgorithm {
 
     String getID();
 
-    void setHashSize(int hashSize);
+    int[] getSupportedKeySizes();
 
-    int getHashSize();
-
-    byte[] digest(byte[] data);
+    void digest(byte[] data, byte[] digest);
 }

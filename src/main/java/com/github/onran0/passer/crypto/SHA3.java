@@ -18,12 +18,11 @@
 
 package com.github.onran0.passer.crypto;
 
+import java.security.DigestException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public final class SHA3 implements IHashingAlgorithm {
-
-    private int hashSize = -1;
 
     @Override
     public String getID() {
@@ -31,26 +30,23 @@ public final class SHA3 implements IHashingAlgorithm {
     }
 
     @Override
-    public void setHashSize(int hashSize) {
+    public int[] getSupportedKeySizes() {
+        return new int[] {224,256,384,512};
+    }
+
+    @Override
+    public void digest(byte[] data, byte[] digest) {
+        int hashSize = digest.length * 8;
+
         if(hashSize != 224 && hashSize != 256 && hashSize != 384 && hashSize != 512)
             throw new IllegalArgumentException("Invalid SHA-3 hash size");
 
-        this.hashSize = hashSize;
-    }
-
-    @Override
-    public int getHashSize() {
-        return this.hashSize;
-    }
-
-    @Override
-    public byte[] digest(byte[] data) {
-        if(hashSize == -1)
-            throw new IllegalStateException("Hash size not set");
-
         try {
-            return MessageDigest.getInstance("SHA3-" + hashSize).digest(data);
-        } catch (NoSuchAlgorithmException e) {
+            var md =  MessageDigest.getInstance("SHA3-" + hashSize);
+
+            md.update(data);
+            md.digest(digest, 0, digest.length);
+        } catch (NoSuchAlgorithmException | DigestException e) {
             throw new RuntimeException(e);
         }
     }
