@@ -32,7 +32,6 @@ public final class CryptoFactory {
     private static final Map<String, Supplier<IKDF>> kdfAlgorithms = new HashMap<>();
 
     static {
-        symmetricCiphers.put(ICipher.AES_CBC, AESCBC::new);
         symmetricCiphers.put(ICipher.AES_GCM, AESGCM::new);
 
         hashingAlgorithms.put(IHashingAlgorithm.SHA2, SHA2::new);

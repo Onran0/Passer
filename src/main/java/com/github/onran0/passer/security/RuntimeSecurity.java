@@ -37,7 +37,7 @@ public final class RuntimeSecurity {
     private static final int KEY_LENGTH = 32;
     private static final boolean PUT_KEY_TO_CIPHERTEXT = false;
     private static final byte[] KEY;
-    private static final ISymmetricCipher CIPHER = new AESCBC();
+    private static final ISymmetricCipher CIPHER = new AESGCM();
     private static final IHashingAlgorithm HASHING_ALGORITHM = new SHA2();
 
     static {
