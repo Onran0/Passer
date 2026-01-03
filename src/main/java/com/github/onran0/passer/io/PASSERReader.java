@@ -78,14 +78,14 @@ public final class PASSERReader {
 
         RuntimeSecurity.clear(decryptedMasterPassword);
 
-        cipher.setKey(key);
-        cipher.setIV(in.readNBytes(cipher.getIVSizeInBytes()));
+        byte[] iv = in.readNBytes(cipher.getIVSizeInBytes());
 
         final DataInputStream decryptedDataInput = new DataInputStream(new ByteArrayInputStream(
-                cipher.decrypt(in.readNBytes(in.readInt()))
+                cipher.decrypt(in.readNBytes(in.readInt()), key, iv)
         ));
 
         RuntimeSecurity.clear(key);
+        RuntimeSecurity.clear(iv);
 
         final List<PasswordInfo> passwordInfos = new ArrayList<>();
 

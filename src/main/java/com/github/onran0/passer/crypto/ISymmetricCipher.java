@@ -22,17 +22,11 @@ import java.security.GeneralSecurityException;
 
 public interface ISymmetricCipher extends ICipher{
 
-    void setKey(byte[] key);
-
-    byte[] getKey();
-
     int getIVSizeInBytes();
 
-    void setIV(byte[] iv);
+    int[] getSupportedKeySizes();
 
-    byte[] getIV();
+    byte[] encrypt(byte[] plaintext, byte[] key, byte[] iv) throws GeneralSecurityException;
 
-    byte[] encrypt(byte[] plaintext) throws GeneralSecurityException;
-
-    byte[] decrypt(byte[] ciphertext) throws GeneralSecurityException;
+    byte[] decrypt(byte[] ciphertext, byte[] key, byte[] iv) throws GeneralSecurityException;
 }

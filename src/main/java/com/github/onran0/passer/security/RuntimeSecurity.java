@@ -100,20 +100,20 @@ public final class RuntimeSecurity {
 
             result.write(iv);
 
-            CIPHER.setKey(xor(
+            byte[] fkey = xor(
                     key,
                     HASHING_ALGORITHM.digest(additionalMaterial.getBytes(StandardCharsets.UTF_8))
-            ));
-            CIPHER.setIV(iv);
+            );
 
-            result.write(CIPHER.encrypt(plaintext));
+            result.write(CIPHER.encrypt(plaintext, fkey, iv));
+
+            clear(fkey);
+            clear(iv);
         } catch(IOException | GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
 
         if(PUT_KEY_TO_CIPHERTEXT) clear(key);
-        clear(CIPHER.getKey());
-        clear(CIPHER.getIV());
 
         return result.toByteArray();
     }
@@ -125,23 +125,22 @@ public final class RuntimeSecurity {
         byte[] iv = Arrays.copyOfRange(ciphertext, keyLength, keyLength + CIPHER.getIVSizeInBytes());
         ciphertext = Arrays.copyOfRange(ciphertext, keyLength + CIPHER.getIVSizeInBytes(), ciphertext.length);
 
-        CIPHER.setKey(xor(
-                key,
-                HASHING_ALGORITHM.digest(additionalMaterial.getBytes(StandardCharsets.UTF_8))
-        ));
-        CIPHER.setIV(iv);
-
         byte[] plaintext;
 
         try {
-            plaintext = CIPHER.decrypt(ciphertext);
+            byte[] fkey = xor(
+                    key,
+                    HASHING_ALGORITHM.digest(additionalMaterial.getBytes(StandardCharsets.UTF_8))
+            );
+
+            plaintext = CIPHER.decrypt(ciphertext, fkey, iv);
+            clear(fkey);
+            clear(iv);
         } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
 
         if(PUT_KEY_TO_CIPHERTEXT) clear(key);
-        clear(CIPHER.getKey());
-        clear(CIPHER.getIV());
 
         return plaintext;
     }

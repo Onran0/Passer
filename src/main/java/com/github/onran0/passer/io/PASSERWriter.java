@@ -69,8 +69,6 @@ public final class PASSERWriter {
 
         CryptoFactory.getSecureRandom().nextBytes(iv);
 
-        cipher.setIV(iv);
-
         byte[] salt = new byte[kdf.getSaltLength()];
 
         CryptoFactory.getSecureRandom().nextBytes(salt);
@@ -86,8 +84,6 @@ public final class PASSERWriter {
 
         RuntimeSecurity.clear(decryptedMasterPassword);
 
-        cipher.setKey(key);
-
         out.write(SharedFunctional.MAGIC);
         out.writeShort((short) version);
         out.writeUTF(kdf.getID());
@@ -95,8 +91,8 @@ public final class PASSERWriter {
         out.writeInt(kdf.getIterations());
 
         out.writeUTF(cipher.getID());
-        out.writeShort((short) cipher.getKey().length);
-        out.write(cipher.getIV());
+        out.writeShort((short) key.length);
+        out.write(iv);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -140,10 +136,11 @@ public final class PASSERWriter {
 
         byte[] plaintext = baos.toByteArray();
 
-        byte[] ciphertext = cipher.encrypt(plaintext);
+        byte[] ciphertext = cipher.encrypt(plaintext, key, iv);
 
         RuntimeSecurity.clear(plaintext);
         RuntimeSecurity.clear(key);
+        RuntimeSecurity.clear(iv);
 
         out.writeInt(ciphertext.length);
         out.write(ciphertext);
