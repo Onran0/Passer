@@ -23,45 +23,14 @@ import javax.crypto.spec.PBEKeySpec;
 
 public final class PBKDF2 implements IKDF {
 
+    private static final int DEFAULT_ITERATIONS = 2_000_000;
     private static final int SALT_LENGTH = 16;
 
     private static final String PBKDF2_KDF_ID = "PBKDF2WithHmacSHA256";
 
-    private byte[] salt;
-    private int iterations = -1;
-
-    private void checkInit() {
-        if(
-                salt == null || iterations == -1
-        ) throw new IllegalStateException("Salt, iterations or output length is not initialized");
-    }
-
     @Override
     public String getID() {
         return IKDF.PBKDF2;
-    }
-
-    @Override
-    public void setSalt(byte[] salt) {
-        if(SALT_LENGTH != salt.length)
-            throw new IllegalArgumentException("Invalid salt length");
-
-        this.salt = salt;
-    }
-
-    @Override
-    public byte[] getSalt() {
-        return salt;
-    }
-
-    @Override
-    public void setIterations(int iterations) {
-        this.iterations = iterations;
-    }
-
-    @Override
-    public int getIterations() {
-        return iterations;
     }
 
     @Override
@@ -70,9 +39,12 @@ public final class PBKDF2 implements IKDF {
     }
 
     @Override
-    public void getDerivedKey(byte[] key, char[] material) {
+    public void getDerivedKey(char[] material, byte[] key, byte[] salt, IKDFSpecParams params) {
+        if(SALT_LENGTH != salt.length)
+            throw new IllegalArgumentException("Invalid salt length");
+
         try {
-            PBEKeySpec spec = new PBEKeySpec(material, salt, iterations, key.length * 8);
+            PBEKeySpec spec = new PBEKeySpec(material, salt, ((PBKDF2SpecParams)params).getIterations(), key.length * 8);
             SecretKeyFactory skf = SecretKeyFactory.getInstance(PBKDF2_KDF_ID);
 
 
@@ -82,5 +54,10 @@ public final class PBKDF2 implements IKDF {
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public IKDFSpecParams getNewParams() {
+        return new PBKDF2SpecParams(DEFAULT_ITERATIONS);
     }
 }

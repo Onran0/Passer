@@ -33,7 +33,6 @@ public final class PASSERWriter {
 
     private static final int DEFAULT_STORE_VERSION = V_2;
 
-    private static final int KDF_ITERATIONS = 2_000_000;
     private static final int CIPHER_KEY_SIZE = 256;
 
     private final int version;
@@ -73,22 +72,23 @@ public final class PASSERWriter {
 
         CryptoFactory.getSecureRandom().nextBytes(salt);
 
-        kdf.setSalt(salt);
-        kdf.setIterations(KDF_ITERATIONS);
-
         char[] decryptedMasterPassword = masterPassword.getDecryptedData();
 
         byte[] key = new byte[CIPHER_KEY_SIZE / 8];
 
-        kdf.getDerivedKey(key, decryptedMasterPassword);
+        var params = kdf.getNewParams();
+
+        kdf.getDerivedKey(decryptedMasterPassword, key, salt, params);
 
         RuntimeSecurity.clear(decryptedMasterPassword);
 
         out.write(SharedFunctional.MAGIC);
         out.writeShort((short) version);
         out.writeUTF(kdf.getID());
-        out.write(kdf.getSalt());
-        out.writeInt(kdf.getIterations());
+        out.write(salt);
+        params.serialize(out);
+
+        RuntimeSecurity.clear(salt);
 
         out.writeUTF(cipher.getID());
         out.writeShort((short) key.length);

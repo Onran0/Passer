@@ -18,18 +18,13 @@
 
 package com.github.onran0.passer.crypto;
 
-import java.util.List;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
-public interface IKDF {
-    String PBKDF2 = "PBKDF2";
+public interface IKDFSpecParams {
 
-    List<String> ALGORITHMS = List.of(PBKDF2);
+    void serialize(DataOutputStream out) throws IOException;
 
-    String getID();
-
-    int getSaltLength();
-
-    void getDerivedKey(char[] material, byte[] key, byte[] salt, IKDFSpecParams params);
-
-    IKDFSpecParams getNewParams();
+    void deserialize(DataInputStream in) throws IOException;
 }

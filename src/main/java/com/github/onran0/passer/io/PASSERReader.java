@@ -56,8 +56,9 @@ public final class PASSERReader {
 
         byte[] salt = in.readNBytes(kdf.getSaltLength());
 
-        kdf.setSalt(salt);
-        kdf.setIterations(in.readInt());
+        var params = kdf.getNewParams();
+
+        params.deserialize(in);
 
         final String encryptionAlgorithm = in.readUTF();
 
@@ -74,9 +75,10 @@ public final class PASSERReader {
 
         byte[] key = new byte[keySize];
 
-        kdf.getDerivedKey(key, decryptedMasterPassword);
+        kdf.getDerivedKey(decryptedMasterPassword, key, salt, params);
 
         RuntimeSecurity.clear(decryptedMasterPassword);
+        RuntimeSecurity.clear(salt);
 
         byte[] iv = in.readNBytes(cipher.getIVSizeInBytes());
 
