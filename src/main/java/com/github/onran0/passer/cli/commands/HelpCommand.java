@@ -52,7 +52,9 @@ public class HelpCommand extends Command {
                 
                 info - shows information about a specific password
                 
-                copy - copies a specific password to the clipboard and erases it after a minute
+                copy - copies a specific password to the clipboard and erases it after a 20 seconds
+                
+                copyl - copies a specific login to the clipboard and erases it after a 20 seconds
                 
                 add - adds a new password to the storage
                 
