@@ -21,7 +21,6 @@ package com.github.onran0.passer.core;
 import com.github.onran0.passer.io.PASSERReader;
 import com.github.onran0.passer.io.PASSERWriter;
 import com.github.onran0.passer.security.RuntimeSecurity;
-import com.github.onran0.passer.security.SecuredBool;
 import com.github.onran0.passer.security.SecuredCharArray;
 import com.github.onran0.passer.security.SecurityUtil;
 
@@ -32,7 +31,7 @@ import java.util.prefs.Preferences;
 
 public class PasserCore {
 
-    public static final String VERSION = "0.2.0";
+    public static final String VERSION = "0.3.0";
 
     public static final char[] MISSING_PROPERTY_DEFAULT = "Not set".toCharArray();
     public static final int RECENT_FILES_COUNT = 10;

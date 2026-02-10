@@ -48,6 +48,7 @@ public class PasserCLI extends PasserCore {
         executor.addCommand("list", new ListCommand());
         executor.addCommand("info", new InfoCommand());
         executor.addCommand("copy", new CopyCommand());
+        executor.addCommand("copyl", new CopyLoginCommand());
         executor.addCommand("add", new AddCommand());
         executor.addCommand("rem", new RemoveCommand());
         executor.addCommand("mod", new ModifyCommand());

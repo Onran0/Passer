@@ -19,28 +19,23 @@
 package com.github.onran0.passer.cli.commands;
 
 import com.github.onran0.passer.cli.commands.core.Command;
-
 import com.github.onran0.passer.cli.commands.core.NonOptionArgumentsParser;
 import com.github.onran0.passer.core.PasswordInfo;
 import com.github.onran0.passer.core.PasswordType;
-
 import com.github.onran0.passer.security.RuntimeSecurity;
-
 import com.github.onran0.passer.util.Convert;
-
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-
 import java.nio.charset.StandardCharsets;
 
 import static com.github.onran0.passer.cli.Colors.RED;
 import static com.github.onran0.passer.cli.Colors.RESET;
 
-public class CopyCommand extends Command {
+public class CopyLoginCommand extends Command {
 
     @Override
     protected boolean openedFileRequired() { return true; }
@@ -56,40 +51,14 @@ public class CopyCommand extends Command {
 
         PasswordInfo passwordInfo = getCore().getPasses().getPasses().get(id);
 
-        int[] passTypeRaw = passwordInfo.getPasswordType();
-
-        String password;
-
-        final PasswordType passType = PasswordType.fromID(passTypeRaw[0]);
-
-        if(passType == null) {
-            out().println(RED + "undefined password type" + RESET);
-            return;
-        }
-
-        byte[] binaryPassword = passwordInfo.getPassword();
-
-        switch(passType) {
-            case TEXT:
-                password = new String(binaryPassword, StandardCharsets.UTF_8);
-                break;
-
-            case BINARY:
-                password = Convert.binaryToHex(binaryPassword);
-                break;
-
-            default:
-                out().println(RED + "unknown password type" + RESET);
-                return;
-        }
+        char[] login = passwordInfo.getLogin();
 
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents(new StringSelection(password), null);
+        clipboard.setContents(new StringSelection(new String(login)), null);
 
-        RuntimeSecurity.clear(binaryPassword);
-        RuntimeSecurity.clear(passTypeRaw);
+        RuntimeSecurity.clear(login);
 
-        out().println("password has been copied to the clipboard and will be erased from there in 20 seconds");
+        out().println("login has been copied to the clipboard and will be erased from there in 20 seconds");
 
         getCore().eraseClipboardAfter(20000);
     }
